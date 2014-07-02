@@ -1,0 +1,224 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>Does Your Rep Support Net Neutrality?</title>
+
+<style type="text/css">
+
+.container {
+ font-family: 'roboto', Helvetica, Arial, sans-serif;
+ width: 1100px;
+ padding-top: 0px;
+ padding-left: 5px;
+ padding-right: 5px;
+ margin: 5px;
+}
+
+.right {
+    float: right;
+    width: 600px;
+    margin: 0px;
+}
+
+
+.inner-container {
+ 
+    width: 300px;
+    margin: 0px;
+    top:-5px;
+}
+
+.left {
+    float: left;
+    width: 400px;  
+    font-size: 14px;
+    padding-left: 10px;
+
+} 
+
+
+h2 {
+
+color: #181818;
+font-size: 20px;
+font-size: 2rem;
+border-bottom: 4px solid #e3253b;
+padding-bottom: 2px;
+margin-bottom: 10px;
+}
+
+ .next { 
+    background-color: #b32636;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius:6px;
+    color: #fff;
+
+    font-size: 20px;
+    text-decoration: none;
+    cursor: pointer;
+    border:none;
+    padding: 10px 20px;
+ }
+
+#submit {
+    background-color: #FF0000;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius:6px;
+    color: #fff;
+    
+    font-size: 20px;
+    text-decoration: none;
+    cursor: pointer;
+    border:none;
+    padding: 10px 20px;
+}
+
+
+
+#submit:hover {
+    border: none;
+    background:red;
+    box-shadow: 0px 0px 1px #777;
+}
+
+</style>
+
+<script
+	src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"
+	type="text/javascript"></script>
+	
+<script type="text/javascript">
+function capitaliseFirstLetter(string)
+{
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+var repsData = new Object;
+$(document).ready(function(){
+	$(':submit').on('click', function() { // This event fires when a button is clicked	
+		var button = $(this).val();
+		var zipValue = document.getElementById('myZip').value;
+		var spreadsheetURL = "http://spreadsheets.google.com/feeds/list/0Alo1Flz--DlodExtdzRMUW1HTGxmVkZENDhnbEdIbFE/od6/public/basic?alt=json";
+		var spreadsheetJSON;
+		var NNData = new Object;
+		if (zipValue){
+			//check that we have a zip code submitted	
+			var query_params = { apikey: 'e595c253eb19468c9f12d743f77226f1',
+		        zip: zipValue};
+			$.ajax('https://congress.api.sunlightfoundation.com/legislators/locate', { // ajax call starts
+			
+			data: query_params,
+			type: 'GET',
+			dataType: 'jsonp', // Choosing a JSON datatype
+			success: function(data){ // Variable data constains the data we get from serverside
+				$('#congressman').html(''); // Clear #congressman div	
+				repsData = data['results'];		
+				}
+			});
+
+			$.ajax(spreadsheetURL, { // ajax call starts
+				data: {},
+				type: 'GET',
+				dataType: 'jsonp', // Choosing a JSON datatype
+				success: function(spreadsheetJSON){ // Variable data constains the data we get from serverside
+					$.each(spreadsheetJSON.feed.entry, function(i,entry) {	
+					myBioID = entry['title']['$t'];
+					myValues = entry['content']['$t'];
+					NNData[myBioID] = myValues;
+				}); 
+				
+				for (var i in repsData){
+					var overallNNSupport = "";
+					var supportNN = "Unknown";
+					var supportTitleII = "Unknown";
+					var imgString = "http://theunitedstates.io/images/congress/225x275/" + repsData[i]['bioguide_id'] + ".jpg";
+					bioIDLookup = repsData[i]['bioguide_id'];
+					nnString = NNData[bioIDLookup];		
+					var nnsplit = new Object;
+					var supportsNN = "";
+					var supportsTitleII = "";
+					if (nnString){			
+						nnsplit = nnString.split(",");			 
+ 						var supportsnetneutralityPos = nnsplit[2].split(":");
+ 						supportNN = supportsnetneutralityPos[1];
+ 						var supportstitleiiPos = nnsplit[3].split(":");
+ 						supportTitleII = supportstitleiiPos[1];
+					}
+					console.log(repsData[i]['contact_form']);
+					$('#congressman').append(
+							"<img style='margin: 2px 30px;' src='"+ imgString + "' width='225' height='275' align='left'>" + 
+							
+							"<p><b>" + repsData[i]['title']  + " " + repsData[i]['first_name'] + " "+ repsData[i]['last_name'] + "</b></p>" +
+							repsData[i]['party'] + ", " + capitaliseFirstLetter(repsData[i]['chamber']) + "  <br/>"
+							);
+					if (supportNN.indexOf("Yes") > -1){
+							//supports NN
+						$('#congressman').append("Call " + repsData[i]['title']  + " " + repsData[i]['first_name'] + " "+ repsData[i]['last_name'] +
+								" at " +repsData[i]['phone'] +" to thank them for standing up for Net Neutrality.<br/>" +	
+						"<a href='" + repsData[i]['contact_form'] + "'>Contact Them to thank them for their support.</a>  <br/>" +
+						"<a href='https://twitter.com/intent/tweet?count=vertical&text=Thank You for Supporting Net Neutrality&screen_name=" + repsData[i]['twitter_id'] + "' class='twitter-mention-button' data-lang='en'> <br>");
+						
+					}else{
+						//does not or unknown
+						$('#congressman').append("Call " +repsData[i]['title']  + " " + repsData[i]['first_name'] + " "+ repsData[i]['last_name'] +
+								" at " +repsData[i]['phone'] +" to ask them to  support Net Neutrality.<br/>" +
+						"<a href='" + repsData[i]['contact_form'] + "'>Write to ask them for their support.</a>  <br/>" +
+						"<a href='https://twitter.com/intent/tweet?count=vertical&text=Please support Net Neutrality&screen_name=" 
+								+ repsData[i]['twitter_id'] + "' class='twitter-mention-button' data-lang='en'> <br>");
+						
+					}
+					
+					twttr.widgets.load();
+					$('#congressman').append("<br clear='all'>");
+				}
+			}
+		});
+		}else{
+			//no zip code submitted
+			$('#congressman').append("Please enter a zip code.  <br/>");
+		}
+		return false; // keeps the page from not refreshing 
+	});
+	
+});
+
+</script>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="https://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+</head>
+
+<body>
+
+<div class=container>
+<div>
+<h2>Tell Congress to Support Real Net Neutrality</h2>
+</div>
+
+<div class="left">
+<b> Enter your Zip Code</b>
+	<form method="post" action="">
+	<input type="text" value="" id="myZip">
+		 
+		 <input type="submit" class="next" value="Look up your Representatives's Position">
+	</form>
+	<p>Without net neutrality rules in place, ISPs can provide slower speeds for services like Netflix and Hulu, or even redirect users from one website to a competing website.
+	In the absense of net neutrality, companies can buy priority access to ISP customers. Larger, wealthier companies like Google or Facebook can pay ISPs to provide faster, 
+	more reliable access to their websites than to potential competitors. 
+	
+	PK is fighting for reclassification by the FCC of internet to a telecommunications service under Title II, instead of the 
+	outdated current classification of information service. 
+	This reclassification is the only way forward for FCC to have the authority to enforce net neutrality rules, 
+	which will allow customers to have a reasonable expectation of consistent, reliable, and nondiscriminatory services.
+	</p>
+	
+</div>
+	<div class="right" id="congressman">
+		<!-- Javascript will print data in here -->
+	</div>
+	
+	<p>
+	<p>
+</body>
+</html>
