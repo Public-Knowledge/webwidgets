@@ -1,10 +1,7 @@
-<html>
-<title>contact your reps</title>
-<body>
-<script
+
+						<script
 	src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"
-	type="text/javascript"></script>
-	<script>
+	type="text/javascript"></script><script>
 	
 
 	function toggle(myID){
@@ -13,6 +10,7 @@
 		$(myID).css("border-width", "2px");
 		$(myID).css("background-color", "#e7e6d6");
 		$(myID).css("padding", "5px")
+
 	}
 	
 	
@@ -32,7 +30,7 @@ function makeDivLink(url, text, options) {
 	} else {
 		options = { css_class: '', pre_text: '', data_lang: '' };
 	}
-    console.log("*class " + options.css_class);
+  
 
     return '<div>' + options.pre_text +
         '<a href="' + url + '" data-lang="' + options.data_lang + '" target="_blank" class="' + options.css_class +'">' + text + '</a></div>';
@@ -48,7 +46,15 @@ function repImageTag(bioguideID) {
 function lookupPosition() {
     // This event fires when a button is clicked
     var zipValue = document.getElementById('myZip').value;
-	console.log("zip: " + zipValue);
+
+
+  ga('create', 'UA-478162-13', {'name': 'buttonTracker'});  // Creates a tracker.
+             // Sends a pageview.
+
+  ga('send', 'pageview', {
+     'eventCategory': 'ZipCodeLookup',
+     'eventAction': 'ContactRepLookup'
+  });
     // Clear out any existing data
     $('#congress_members').html("Working...");
 
@@ -80,8 +86,6 @@ function makeRepHTML(repsData) {
   
         bioIDLookup = repsData[counter]['bioguide_id'];
        
-       
-
         var repFullName = thisData.title + ". " + thisData.first_name +
             " " + thisData.last_name;
 
@@ -91,6 +95,8 @@ function makeRepHTML(repsData) {
      }else if (thisData.party.indexOf("R") > -1){
          thisData.party = "Republican";
      }
+        var contactInfo = "Reach " + repFullName + " at " + thisData.phone;
+
         // Construct the output
         myOutput = '<br clear="all" /><p>' +
             repImageTag(thisData.bioguide_id) +
@@ -102,13 +108,14 @@ function makeRepHTML(repsData) {
                 repFullName + " at <b>" + thisData.phone +
                 "</b> to ask " +
                 (thisData.gender == 'M' ? "him " : "her ") + phoneCallScript + ".<br/>" +
-                "<a href=\"#\" onclick=\"updateRepDialog('" + repFullName + "');\">Click here to see what to say.</a></p>";
-        
+                "<a href=\"#\" onclick=\"updateRepDialog('" + repFullName +
+                "', '" + contactInfo + "');return false;\">Click here to see what to say.</a></p>";
+
         var contactURL = thisData.contact_form;
         if (thisData.twitter_id) {
-        	var tweetURL = "https://twitter.com/intent/tweet?text=Support+real+%23netneutrality+tell+@fcc+they+need+to+classify+the+%23Internet+as+a+communications+service&screen_name=" + thisData.twitter_id;
+        	var tweetURL = "https://twitter.com/intent/tweet?text=Support+real+%23netneutrality.+Tell+@fcc+they+need+to+classify+the+%23Internet+as+a+communications+service.+@publicknowledge+&screen_name=" + thisData.twitter_id;
             
-         //   var tweetURL = "https://twitter.com/intent/tweet?text=Please+support+net+neutrality&screen_name=" + thisData.twitter_id;
+        
             myOutput += makeDivLink(tweetURL, 'Tweet', {
                     pre_text: "&nbsp; ",
                     css_class: 'twitter-mention-button',
@@ -118,13 +125,15 @@ function makeRepHTML(repsData) {
         }
         $('#congress_members').append("<div class='member'>" +
                 myOutput + "</div>");
+        $("#dialog").css("z-index", "2000");
         twttr.widgets.load();
 
     }
 }
 
-function updateRepDialog(repName) {
+function updateRepDialog(repName, contactInfo) {
   $('#dialog-rep').html(repName);
+  $('#rep-contact-info').html(contactInfo);
   $('#dialog-underlay').show();
 }
 </script>
@@ -142,22 +151,26 @@ function updateRepDialog(repName) {
     border:none;
     padding: 10px 20px;
  }
+
 #dialog-underlay {
   top: 0; bottom: 0; left: 0; right: 0;
   position: fixed;
   background-color: rgba(0,0,0,0.5);
   display: none;
+
 }
+
 #dialog-underlay #dialog {
   width: 45%;
   height: 45%;
-  margin-top: auto; margin-bottom: auto; margin-left: auto; margin-right: auto;
+  margin-top: auto; margin-bottom: auto; margin-left: 10%; margin-right: auto;
   top: 0; left: 0; right: 0; bottom: 0;
   position: absolute;
   background-color: white;
   padding: 2em;
   border: 3px black solid;
   overflow: scroll;
+
 }
 </style>
 <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="https://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
@@ -173,6 +186,10 @@ function updateRepDialog(repName) {
 
 <div id="dialog-underlay" onclick="$('#dialog-underlay').hide();">
 <div id="dialog" title="Dialog Title">
+<div id="closeme" onclick="$('#dialog-underlay').hide();" style="border: 1px solid black; position: absolute; top: 6px; right: 12px; cursor: pointer; font-size: 20px;">&times;</div>
+
+<h2 id="rep-contact-info">Call your representative</h2>
+
 <p>Hello, my name is [NAME], from [CITY/TOWN, STATE].</p>
 
 <p>I am calling because there are reports that there will be a harmful amendment to H.R. 5016, the Financial Services and General Government Appropriations Act of 2015, when that bill comes to the floor this week for general debate. This amendment would cut off the current FCC proceeding to make strong Net Neutrality rules under Title II of the Communications Act.</p>
@@ -182,5 +199,5 @@ function updateRepDialog(repName) {
 <p>Please tell <span id="dialog-rep">my representative</span> to oppose this amendment and vote "NO" when it comes to the floor. Thank you!</p>
 </div>
 </div>
-</body></html>
+
 						
