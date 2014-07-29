@@ -47,14 +47,12 @@ function lookupPosition() {
     // This event fires when a button is clicked
     var zipValue = document.getElementById('myZip').value;
 
+    //Google Analytics code to create a page view for each Rep Lookup 
+    // see https://developers.google.com/analytics/devguides/collection/analyticsjs/events
+    //ga('send', 'event', 'category', 'action', 'label');
+    
+    ga('send', 'event', 'button', 'click', 'zipLookup');
 
-  ga('create', 'UA-478162-13', {'name': 'buttonTracker'});  // Creates a tracker.
-             // Sends a pageview.
-
-  ga('send', 'pageview', {
-     'eventCategory': 'ZipCodeLookup',
-     'eventAction': 'ContactRepLookup'
-  });
     // Clear out any existing data
     $('#congress_members').html("Working...");
 
