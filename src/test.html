@@ -1,0 +1,30 @@
+<html>
+    <head>
+        <script
+            src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"
+            type="text/javascript"></script>
+        <script src="contact-reps.js"></script>
+        <link rel="stylesheet" href="contact-reps.css">
+    </head>
+    <body>
+
+
+        <div class="left" id="zip_form">
+            <b>Enter your Zip Code</b>
+        </div>
+        <div id="congress_members"></div>
+
+        <div id="overlay_text">
+            <h2 id="rep-contact-info">Call your representative</h2>
+
+            <p>Please tell <span id="dialog-rep">my representative</span> to
+            do this thing!</p>
+        </div>
+        <script>
+            RepDataContactWidget.setup('#zip_form', 'tweet this text',
+            '#overlay_text');
+        </script>
+</div>
+
+</body>
+</html>

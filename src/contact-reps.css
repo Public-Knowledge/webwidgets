@@ -1,0 +1,34 @@
+.next { 
+    background-color: #b32636;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius:6px;
+    color: #fff;
+
+    font-size: 20px;
+    text-decoration: none;
+    cursor: pointer;
+    border:none;
+    padding: 10px 20px;
+ }
+
+#dialog-underlay {
+  top: 0; bottom: 0; left: 0; right: 0;
+  position: fixed;
+  background-color: rgba(0,0,0,0.5);
+  display: none;
+
+}
+
+#dialog-underlay #dialog {
+  width: 45%;
+  height: 45%;
+  margin-top: auto; margin-bottom: auto; margin-left: 10%; margin-right: auto;
+  top: 0; left: 0; right: 0; bottom: 0;
+  position: absolute;
+  background-color: white;
+  padding: 2em;
+  border: 3px black solid;
+  overflow: scroll;
+
+}
