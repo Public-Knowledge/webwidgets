@@ -4,6 +4,9 @@ var RepDataContactWidget = (function() {
     var repsData = new Object;
     var sunlightURL = 'https://congress.api.sunlightfoundation.com/' +
         'legislators/locate';
+    var overlayBack = 'repcontact_overlay_background';
+    var overlayDialog = 'repcontact_overlay_dialog';
+    var overlayClose = 'repcontact_overlay_close';
 
     return {
         makeDivLink: function(url, text, options) {
@@ -88,12 +91,14 @@ var RepDataContactWidget = (function() {
                     '</p> <p><b>' + repFullName +
                     "</b><br/>" + thisData.party + "</p>";
 
-                myOutput = myOutput +
-                    "<p>Call " +
-                    repFullName + " at <b>" + thisData.phone +
-                    "</b> to ask " +
-                    (thisData.gender == 'M' ? "him " : "her ") +
-                    phoneCallScript + ".<br/><a href=\"#\" " +
+                var text_params = {
+                    name: repFullName,
+                    phone: thisData.phone,
+                    her: (thisData.gender == 'M' ? "him " : "her ")
+                };
+                myOutput +=
+                    "<p>" + this.replaceText(this.text, text_params) + "</p>" +
+                    "<br/><a href=\"#\" " +
                     "onclick=\"RepDataContactWidget.updateDialog('" +
                     repFullName + "', '" + contactInfo +
                     "');return false;\">Click here to see what to say.</a></p>";
@@ -114,7 +119,7 @@ var RepDataContactWidget = (function() {
         updateDialog: function(repName, contactInfo) {
             $('#dialog-rep').html(repName);
             $('#rep-contact-info').html(contactInfo);
-            $('#dialog-underlay').show();
+            $('#' + overlayBack).show();
         },
         makeForm: function(element) {
             var formHTML = '<form><input id="myZip" size="5" type="text" ' +
@@ -122,29 +127,40 @@ var RepDataContactWidget = (function() {
                 'onclick="RepDataContactWidget.lookupPosition();" ' +
                 '>Lookup</button></form>';
             $(element).append(formHTML);
+            $(element).after('<div id="congress_members"></div>');
         },
         setTweetText: function(text) {
             this.tweetText = encodeURIComponent(text);
         },
 
-        makeOverlay: function(element) {
-            var overlayHTML = '<div id="dialog-underlay" ' +
-                'onclick="$(\'#dialog-underlay\').hide();">' +
-                '<div id="dialog" title="Dialog Title">' +
-                '<div id="closeme" onclick="$(\'#dialog-underlay\').hide();" ' +
-                'style="border: 1px solid black; position: absolute; ' +
-                'top: 6px; right: 12px; cursor: pointer; font-size: 20px;">' +
-                '&times;</div></div></div>';
+        makeOverlay: function(text) {
+            text_params = {
+                call_your_rep: '<span id="rep-contact-info">Call</span>',
+                name: '<span id="dialog-rep">my rep</span>'
+            };
+            var overlayHTML = '<div id="' + overlayBack + '">' +
+                '<div id="' + overlayDialog + '" title="Dialog Title">' +
+                '<div id="' + overlayClose + '">&times;</div>' +
+                this.replaceText(text, text_params) + '</div></div>';
             $('body').append(overlayHTML);
-            element = $(element);
-            element.detach();
-            $('#dialog').append(element);
+            var overlayBackElt = $('#' + overlayBack);
+            overlayBackElt.on('click', function() { overlayBackElt.hide(); });
+            $('#' + overlayClose).on('click', function() {
+                overlayBackElt.hide();
+            });
         },
 
-        setup: function(form_element, tweetText, overlay_element) {
-            this.makeForm(form_element);
-            this.setTweetText(tweetText);
-            this.makeOverlay(overlay_element);
+        setup: function(options) {
+            this.makeForm(options.form);
+            this.setTweetText(options.tweet);
+            this.makeOverlay(options.overlay);
+            this.text = options.text;
+        },
+
+        replaceText: function(text, params) {
+            return text.replace(/\{(\w+)\}/g, function(m, p1) {
+                return (params[p1] || m);
+            });
         }
 
     };

@@ -12,7 +12,7 @@
     padding: 10px 20px;
  }
 
-#dialog-underlay {
+#repcontact_overlay_background {
   top: 0; bottom: 0; left: 0; right: 0;
   position: fixed;
   background-color: rgba(0,0,0,0.5);
@@ -20,7 +20,7 @@
 
 }
 
-#dialog-underlay #dialog {
+#repcontact_overlay_background #repcontact_overlay_dialog {
   width: 45%;
   height: 45%;
   margin-top: auto; margin-bottom: auto; margin-left: 10%; margin-right: auto;
@@ -29,6 +29,16 @@
   background-color: white;
   padding: 2em;
   border: 3px black solid;
-  overflow: scroll;
+  overflow-y: scroll;
 
+}
+#repcontact_overlay_background #repcontact_overlay_close {
+    border: 1px solid black;
+    cursor: pointer;
+    font-size: 20px;
+    padding-left: .2em;
+    padding-right: .2em;
+    position: absolute;
+    top: 6px;
+    right: 12px;
 }
