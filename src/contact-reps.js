@@ -122,10 +122,10 @@ var RepDataContactWidget = (function() {
             $('#' + overlayBack).show();
         },
         makeForm: function(element) {
-            var formHTML = '<form><input id="myZip" size="5" type="text" ' +
+            var formHTML = '<div><input id="myZip" size="5" type="text" ' +
                 'value="" /> <button class="next" ' +
                 'onclick="RepDataContactWidget.lookupPosition();" ' +
-                '>Lookup</button></form>';
+                '>Lookup</button></div>';
             $(element).append(formHTML);
             $(element).after('<div id="congress_members"></div>');
         },
